@@ -39,9 +39,8 @@ const s3 = new S3Client({
     }
  });
 
-const storage = multer.memoryStorage(); 
 const upload = multer({
-    storage: storage,
+    storage: multer.memoryStorage(),
     limits: { fileSize: 10 * 1024 * 1024 }, 
 });
 
