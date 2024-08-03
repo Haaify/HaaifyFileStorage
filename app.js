@@ -31,7 +31,7 @@ app.get('/', async (req, res) => {
 
 
 const s3 = new S3Client({
-    endpoint: `https://haaifylink.nyc3.digitaloceanspaces.com`,
+    endpoint: `https://nyc3.digitaloceanspaces.com`,
     region: 'us-east-1',
     credentials: {
       accessKeyId: process.env.access_key_id,
