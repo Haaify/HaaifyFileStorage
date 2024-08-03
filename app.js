@@ -7,10 +7,6 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const server = createServer(app);
 
-app.listen(port, () => {
-    console.log(`Servidor rodando na porta ${port}`);
-});
-
 app.use(express.json());
 server.listen(PORT, () => { 
     console.log(`Servidor rodando na porta ${PORT}`);
