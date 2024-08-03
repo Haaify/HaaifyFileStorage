@@ -55,7 +55,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         }
 
         const dateStr = new Date().toISOString().replace(/:/g, '-');
-        const fileName = `${formatarData()}/${formatarHorario()}-${file.originalname}`.replace(/ /g, "_");
+        const fileName = `ClieteExemplo/${formatarData()}/${formatarHorario()}-${file.originalname}`.replace(/ /g, "_");
 
         const uploadParams = {
             Bucket: 'haaifylink', 
