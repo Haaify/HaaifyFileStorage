@@ -53,8 +53,9 @@ app.post('/upload', upload.single('file'), async (req, res) => {
             return res.status(400).send('Nenhum arquivo enviado.');
         }
 
-        const dateStr = new Date().toISOString().replace(/:/g, '-');
-        const fileName = `ClieteExemplo/${formatarData()}/${formatarHorario()}-${file.originalname}`.replace(/ /g, "_");
+        let paramFolder = req.query.folder || "Default"
+
+        const fileName = `${paramFolder}/${formatarData()}/${formatarHorario()}-${file.originalname}`.replace(/ /g, "_");
 
         const uploadParams = {
             Bucket: 'haaifylink', 
