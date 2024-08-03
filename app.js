@@ -37,15 +37,16 @@ const s3 = new S3Client({
       accessKeyId: process.env.access_key_id,
       secretAccessKey: process.env.secret_access_key
     }
-  });
+ });
 
 const storage = multer.memoryStorage(); 
-
 const upload = multer({
     storage: storage,
     limits: { fileSize: 10 * 1024 * 1024 }, 
 });
 
+
+const {formatarData, formatarHorario} = require('.//utils.js');
 app.post('/upload', upload.single('file'), async (req, res) => {
     try {
         const file = req.file;
@@ -54,7 +55,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         }
 
         const dateStr = new Date().toISOString().replace(/:/g, '-');
-        const fileName = `fileStorage/${dateStr}-${file.originalname}`.replace(/ /g, "_");
+        const fileName = `${formatarData()}/${formatarHorario()}-${file.originalname}`.replace(/ /g, "_");
 
         const uploadParams = {
             Bucket: 'haaifylink', 
