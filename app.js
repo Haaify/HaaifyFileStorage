@@ -68,7 +68,7 @@ app.post('/upload', upload.single('file'), async (req, res) => {
         };
 
         const command = new PutObjectCommand(uploadParams);
-        await s3Client.send(command);
+        await s3.send(command);
 
         res.status(200).send(`Arquivo enviado com sucesso: ${fileName}`);
     } catch (err) {
