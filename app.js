@@ -29,10 +29,9 @@ app.get('/', async (req, res) => {
     }
 });
 
-const spacesEndpoint = 'nyc3.cdn.digitaloceanspaces.com';
 
 const s3 = new S3Client({
-    endpoint: `https://${spacesEndpoint}`,
+    endpoint: `https://haaifylink.nyc3.digitaloceanspaces.com`,
     region: 'us-east-1',
     credentials: {
       accessKeyId: process.env.access_key_id,
