@@ -14,6 +14,8 @@ const s3Client = new S3Client({
 // Função para deletar todos os objetos dentro de um folder
 const deleteObjectsInFolder = async (folderPath) => {
   try {
+    console.log(`Attempting to delete objects in folder: ${folderPath}`);
+
     const listParams = {
       Bucket: 'haaifylink',
       Prefix: folderPath,
@@ -21,7 +23,12 @@ const deleteObjectsInFolder = async (folderPath) => {
 
     const listedObjects = await s3Client.send(new ListObjectsV2Command(listParams));
 
-    if (!listedObjects.Contents || listedObjects.Contents.length === 0) return;
+    console.log('ListObjectsV2Command response:', listedObjects);
+
+    if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
+      console.log(`No objects found in folder: ${folderPath}`);
+      return;
+    }
 
     const deleteParams = {
       Bucket: 'haaifylink',
@@ -32,11 +39,17 @@ const deleteObjectsInFolder = async (folderPath) => {
       deleteParams.Delete.Objects.push({ Key });
     });
 
-    await s3Client.send(new DeleteObjectsCommand(deleteParams));
-    console.log(`Deleted objects in folder: ${folderPath}`);
+    console.log('Objects to delete:', deleteParams.Delete.Objects);
+
+    const deleteResponse = await s3Client.send(new DeleteObjectsCommand(deleteParams));
+
+    console.log(`Deleted objects in folder: ${folderPath}`, deleteResponse);
 
     // Recursively delete if there are more objects
-    if (listedObjects.IsTruncated) await deleteObjectsInFolder(folderPath);
+    if (listedObjects.IsTruncated) {
+      console.log(`More objects to delete in folder: ${folderPath}`);
+      await deleteObjectsInFolder(folderPath);
+    }
   } catch (err) {
     console.error('Error deleting objects:', err);
   }
@@ -45,12 +58,16 @@ const deleteObjectsInFolder = async (folderPath) => {
 // Função principal para buscar e deletar folders por data
 const deleteFoldersByDate = async (targetDate) => {
   try {
+    console.log(`Starting folder deletion process for date: ${targetDate}`);
+
     const listParams = {
       Bucket: 'haaifylink',
       Delimiter: '/',
     };
 
     const listedObjects = await s3Client.send(new ListObjectsV2Command(listParams));
+
+    console.log('ListObjectsV2Command for root folders response:', listedObjects);
 
     // Filtrar folders com a data desejada
     const foldersToDelete = listedObjects.CommonPrefixes
@@ -59,11 +76,16 @@ const deleteFoldersByDate = async (targetDate) => {
 
     console.log(`Folders found for deletion: ${foldersToDelete.join(', ')}`);
 
+    if (foldersToDelete.length === 0) {
+      console.log(`No folders found with the date: ${targetDate}`);
+      return;
+    }
+
     for (const folderPath of foldersToDelete) {
       await deleteObjectsInFolder(folderPath);
     }
 
-    console.log('Folder deletion complete.');
+    console.log('Folder deletion process complete.');
   } catch (err) {
     console.error('Error listing or deleting folders:', err);
   }
