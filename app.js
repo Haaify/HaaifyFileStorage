@@ -29,11 +29,11 @@ app.get('/', async (req, res) => {
   }
 });
 
-//'/api/upload'
+//  '/api/upload'
 const uploadRoutes = require('./API/routes/uploadRoutes');
 app.use('/api', uploadRoutes);
 
-//'/api/delete-folder'
+//  '/api/delete-folder'
 const deleteRoutes = require('./API/routes/deleteRoutes');
 app.use('/api', deleteRoutes);
 

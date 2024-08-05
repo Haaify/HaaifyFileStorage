@@ -13,30 +13,6 @@ const constS3Client = new S3Client({
   }
 });
 
-const uploadFile = async (req, res) => {
-  try {
-    let file = req.file;
-    let { url, folder } = req.body;
-
-
-
-
-    if (file) {
-      await uploadBuffer(file.buffer, file.originalname, folder, res);
-
-    } else if (url) {
-      await uploadFromUrl(url, folder, res);
-
-    } else {
-      return res.status(400).send('Nenhum arquivo ou URL fornecido.');
-    }
-
-  } catch (err) {
-    console.error('Erro ao processar a requisição:', err);
-    res.status(500).send('Erro ao processar a requisição.');
-  }
-};
-
 const uploadBuffer = async (paramBuffer, paramOriginalName, paramFolder, res) => {
   try {
     let letFileName = `${paramFolder || 'Default'}/${formatarData()}/${formatarHorario()}-${paramOriginalName}`.replace(/ /g, "_");
@@ -99,4 +75,4 @@ const uploadFromUrl = async (paramUrl, paramFolder, res) => {
   }
 };
 
-module.exports = { uploadFile };
+module.exports = { uploadBuffer, uploadFromUrl};
