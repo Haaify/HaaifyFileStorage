@@ -2,11 +2,8 @@ const { formatarData, formatarHorario } = require('../utils/format');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path'); // Importar o módulo path
-const fetch = (...args) =>
-  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-
-// Configuração do cliente S3
 const s3 = new S3Client({
   endpoint: 'https://nyc3.digitaloceanspaces.com',
   region: 'us-east-1',
@@ -16,13 +13,11 @@ const s3 = new S3Client({
   }
 });
 
-// Função para lidar com o upload de arquivos
 const uploadFile = async (req, res) => {
   try {
     const file = req.file;
     const { url, folder } = req.body;
 
-    // Identificar se é um arquivo ou um URL
     if (file) {
       // Caso seja um arquivo enviado diretamente
       await uploadBuffer(file.buffer, file.originalname, folder, res);
@@ -39,7 +34,6 @@ const uploadFile = async (req, res) => {
   }
 };
 
-// Função para fazer upload a partir de um buffer de arquivo
 const uploadBuffer = async (buffer, originalName, folder, res) => {
   try {
     const fileName = `${folder || 'Default'}/${formatarData()}/${formatarHorario()}-${originalName}`.replace(/ /g, "_");
@@ -67,31 +61,25 @@ const uploadBuffer = async (buffer, originalName, folder, res) => {
 // Função para fazer upload a partir de um URL
 const uploadFromUrl = async (url, folder, res) => {
   try {
-    // Baixar o arquivo usando fetch
     const response = await fetch(url);
 
-    // Verificar o código de status HTTP
     if (!response.ok) {
       res.status(400).send('Falha ao baixar o arquivo. Verifique o URL e tente novamente.');
       return;
     }
 
-    // Obter o tipo MIME da resposta
     const contentType = response.headers.get('content-type');
 
-    // Gerar um nome único para o arquivo
     const fileName = `${folder || 'Default'}/${formatarData()}/${formatarHorario()}-${uuidv4()}-${path.basename(url)}`.replace(/ /g, '_');
 
-    // Obter o buffer do arquivo
     const fileBuffer = await response.arrayBuffer();
 
-    // Fazer o upload do buffer diretamente para o S3
     const uploadParams = {
       Bucket: 'haaifylink',
       Key: fileName,
       Body: fileBuffer,
       ACL: 'private',
-      ContentType: contentType, // Use o tipo MIME obtido
+      ContentType: contentType,
       Metadata: {
         'x-amz-meta-my-key': 'your-value',
       },
