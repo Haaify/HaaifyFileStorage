@@ -29,8 +29,9 @@ const uploadBuffer = async (paramBuffer, paramOriginalName, paramFolder, res) =>
 
     let letCommand = new PutObjectCommand(letUploadParams);
 
-    await constS3Client.send(letCommand);
-
+    let letSave = await constS3Client.send(letCommand);
+    console.log(letSave)
+    
     res.status(200).send({message: `Arquivo enviado com sucesso`, link: `https://haaifylink.nyc3.cdn.digitaloceanspaces.com/${letFileName}` });
   } catch (err) {
     console.error('Erro ao enviar o arquivo:', err);
@@ -66,7 +67,8 @@ const uploadFromUrl = async (paramUrl, paramFolder, res) => {
     };
 
     let letCommand = new PutObjectCommand(letUploadParams);
-    await constS3Client.send(letCommand);
+    let letSave = await constS3Client.send(letCommand);
+    console.log(letSave)
  
     res.status(200).send({message: `Arquivo enviado com sucesso`, link: `https://haaifylink.nyc3.cdn.digitaloceanspaces.com/${letFileName}` });
   } catch (err) {
