@@ -83,7 +83,7 @@ const uploadFromUrl = async (url, folder, res) => {
     const fileName = `${folder || 'Default'}/${formatarData()}/${formatarHorario()}-${uuidv4()}-${path.basename(url)}`.replace(/ /g, '_');
 
     // Obter o buffer do arquivo
-    const fileBuffer = await response.arrayBuffer()();
+    const fileBuffer = await response.arrayBuffer();
 
     // Fazer o upload do buffer diretamente para o S3
     const uploadParams = {
