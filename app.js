@@ -30,11 +30,11 @@ app.get('/', async (req, res) => {
 });
 
 //'/api/upload'
-const uploadRoutes = require('./routes/uploadRoutes');
+const {uploadRoutes} = require('./routes/uploadRoutes');
 app.use('/api', uploadRoutes);
 
 //'/api/delete-folder'
-const deleteRoutes = require('./routes/deleteRoutes');
+const {deleteRoutes} = require('./routes/deleteRoutes');
 app.use('/api', deleteRoutes);
 
 //delete folders from 3 months ago

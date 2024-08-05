@@ -13,4 +13,4 @@ const upload = multer({
 // Definir a rota POST para upload
 router.post('/upload', upload.single('file'), uploadFile);
 
-module.exports = router;
+module.exports = {router};
