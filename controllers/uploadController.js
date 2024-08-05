@@ -67,17 +67,40 @@ const uploadBuffer = async (buffer, originalName, folder, res) => {
 // Função para fazer upload a partir de um URL
 const uploadFromUrl = async (url, folder, res) => {
   try {
+    // Baixar o arquivo usando fetch
     const response = await fetch(url);
 
+    // Verificar o código de status HTTP
     if (!response.ok) {
       res.status(400).send('Falha ao baixar o arquivo. Verifique o URL e tente novamente.');
       return;
     }
 
+    // Obter o tipo MIME da resposta
+    const contentType = response.headers.get('content-type');
+
+    // Gerar um nome único para o arquivo
+    const fileName = `${folder || 'Default'}/${formatarData()}/${formatarHorario()}-${uuidv4()}-${path.basename(url)}`.replace(/ /g, '_');
+
+    // Obter o buffer do arquivo
     const fileBuffer = await response.buffer();
 
     // Fazer o upload do buffer diretamente para o S3
-    await uploadBuffer(fileBuffer, path.basename(url), folder, res);
+    const uploadParams = {
+      Bucket: 'haaifylink',
+      Key: fileName,
+      Body: fileBuffer,
+      ACL: 'private',
+      ContentType: contentType, // Use o tipo MIME obtido
+      Metadata: {
+        'x-amz-meta-my-key': 'your-value',
+      },
+    };
+
+    const command = new PutObjectCommand(uploadParams);
+    await s3.send(command);
+
+    res.status(200).send(`Arquivo enviado com sucesso: ${fileName}`);
   } catch (err) {
     console.error('Erro ao baixar o arquivo:', err);
     res.status(500).send('Erro ao baixar o arquivo.');
