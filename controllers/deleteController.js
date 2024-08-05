@@ -1,6 +1,6 @@
 const { S3Client, ListObjectsV2Command, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 
-const s3Client = new S3Client({
+const constS3Client = new S3Client({
   endpoint: 'https://nyc3.digitaloceanspaces.com',
   region: 'us-east-1',
   credentials: {
@@ -9,76 +9,76 @@ const s3Client = new S3Client({
   },
 });
 
-const deleteObjectsInFolder = async (folderPath) => {
+const deleteObjectsInFolder = async (paramFolderPath) => {
   try {
-    const listParams = {
+    let letListParams = {
       Bucket: 'haaifylink',
-      Prefix: folderPath,
+      Prefix: paramFolderPath,
     };
 
-    const listedObjects = await s3Client.send(new ListObjectsV2Command(listParams));
+    let letListedObjects = await constS3Client.send(new ListObjectsV2Command(letListParams));
 
-    if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
-      console.log(`No objects found in folder: ${folderPath}`);
+    if (!letListedObjects.Contents || letListedObjects.Contents.length === 0) {
+      console.log(`No objects found in folder: ${paramFolderPath}`);
       return;
     }
 
-    const deleteParams = {
+    let letDeleteParams = {
       Bucket: 'haaifylink',
       Delete: { Objects: [] },
     };
 
-    listedObjects.Contents.forEach(({ Key }) => {
-      deleteParams.Delete.Objects.push({ Key });
+    letListedObjects.Contents.forEach(({ Key }) => {
+      letDeleteParams.Delete.Objects.push({ Key });
     });
 
-    console.log('Objects to delete:', deleteParams.Delete.Objects);
+    console.log('Objects to delete:', letDeleteParams.Delete.Objects);
 
-    const deleteResponse = await s3Client.send(new DeleteObjectsCommand(deleteParams));
+    let letDeleteResponse = await constS3Client.send(new DeleteObjectsCommand(letDeleteParams));
 
-    console.log(`Deleted objects in folder: ${folderPath}`, deleteResponse);
+    console.log(`Deleted objects in folder: ${paramFolderPath}`, letDeleteResponse);
 
-    if (listedObjects.IsTruncated) {
-      await deleteObjectsInFolder(folderPath);
+    if (letListedObjects.IsTruncated) {
+      await deleteObjectsInFolder(paramFolderPath);
     }
   } catch (err) {
     console.error('Error deleting objects:', err);
   }
 };
 
-const deleteFoldersByDate = async (targetDate) => {
+const deleteFoldersByDate = async (paramTargetFolder) => {
   try {
 
-    const listParams = {
+    let letListParams = {
       Bucket: 'haaifylink',
       Delimiter: '/',
     };
 
-    const rootFolders = await s3Client.send(new ListObjectsV2Command(listParams));
+    let letRootFolders = await constS3Client.send(new ListObjectsV2Command(letListParams));
 
-    for (const folder of rootFolders.CommonPrefixes) {
-      const subFolderParams = {
+    for (let letFolder of letRootFolders.CommonPrefixes) {
+      let letSubFolderParams = {
         Bucket: 'haaifylink',
-        Prefix: folder.Prefix,
+        Prefix: letFolder.Prefix,
         Delimiter: '/',
       };
 
-      const subFolders = await s3Client.send(new ListObjectsV2Command(subFolderParams));
+      let letSubFolders = await constS3Client.send(new ListObjectsV2Command(letSubFolderParams));
 
 
-      if (subFolders.CommonPrefixes) {
-        const foldersToDelete = subFolders.CommonPrefixes
+      if (letSubFolders.CommonPrefixes) {
+        let letFoldersToDelete = letSubFolders.CommonPrefixes
           .map(prefix => prefix.Prefix)
-          .filter(prefix => prefix.includes(targetDate));
+          .filter(prefix => prefix.includes(paramTargetFolder));
 
-        console.log(`Folders found for deletion: ${foldersToDelete.join(', ')}`);
+        console.log(`Folders found for deletion: ${letFoldersToDelete.join(', ')}`);
 
-        if (foldersToDelete.length === 0) {
+        if (letFoldersToDelete.length === 0) {
           continue;
         }
 
-        for (const folderPath of foldersToDelete) {
-          await deleteObjectsInFolder(folderPath);
+        for (let letFolderPath of letFoldersToDelete) {
+          await deleteObjectsInFolder(letFolderPath);
         }
       } else {
       }

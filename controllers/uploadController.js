@@ -4,7 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const path = require('path'); // Importar o módulo path
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-const s3 = new S3Client({
+const constS3Client = new S3Client({
   endpoint: 'https://nyc3.digitaloceanspaces.com',
   region: 'us-east-1',
   credentials: {
@@ -50,7 +50,7 @@ const uploadBuffer = async (paramBuffer, paramOriginalName, paramFolder, res) =>
 
     let letCommand = new PutObjectCommand(letUploadParams);
 
-    await s3.send(letCommand);
+    await constS3Client.send(letCommand);
 
     res.status(200).send(`Arquivo enviado com sucesso: ${letFileName}`);
   } catch (err) {
@@ -87,7 +87,7 @@ const uploadFromUrl = async (paramUrl, paramFolder, res) => {
     };
 
     let letCommand = new PutObjectCommand(uploadParams);
-    await s3.send(letCommand);
+    await constS3Client.send(letCommand);
 
     res.status(200).send(`Arquivo enviado com sucesso: ${letFileName}`);
   } catch (err) {
