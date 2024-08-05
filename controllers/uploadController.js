@@ -1,6 +1,7 @@
 const { formatarData, formatarHorario } = require('../utils/format');
 const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { v4: uuidv4 } = require('uuid');
+const path = require('path'); // Importar o módulo path
 const fetch = (...args) =>
   import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
@@ -66,19 +67,13 @@ const uploadBuffer = async (buffer, originalName, folder, res) => {
 // Função para fazer upload a partir de um URL
 const uploadFromUrl = async (url, folder, res) => {
   try {
-    // Baixar o arquivo usando fetch
     const response = await fetch(url);
 
-    // Verificar o código de status HTTP
     if (!response.ok) {
       res.status(400).send('Falha ao baixar o arquivo. Verifique o URL e tente novamente.');
       return;
     }
 
-    // Gerar um nome único para o arquivo
-    const fileName = `${folder || 'Default'}/${formatarData()}/${formatarHorario()}-${uuidv4()}-${path.basename(url)}`.replace(/ /g, '_');
-
-    // Obter o buffer do arquivo
     const fileBuffer = await response.buffer();
 
     // Fazer o upload do buffer diretamente para o S3
