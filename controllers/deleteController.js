@@ -81,20 +81,25 @@ const deleteFoldersByDate = async (targetDate) => {
 
       console.log(`Sub-folders within ${folder.Prefix}:`, subFolders);
 
-      // Filtrar subfolders com a data desejada
-      const foldersToDelete = subFolders.CommonPrefixes
-        .map(prefix => prefix.Prefix)
-        .filter(prefix => prefix.includes(targetDate));
+      // Verificação se CommonPrefixes existe antes de tentar mapear
+      if (subFolders.CommonPrefixes) {
+        // Filtrar subfolders com a data desejada
+        const foldersToDelete = subFolders.CommonPrefixes
+          .map(prefix => prefix.Prefix)
+          .filter(prefix => prefix.includes(targetDate));
 
-      console.log(`Folders found for deletion: ${foldersToDelete.join(', ')}`);
+        console.log(`Folders found for deletion: ${foldersToDelete.join(', ')}`);
 
-      if (foldersToDelete.length === 0) {
-        console.log(`No folders found with the date: ${targetDate} in ${folder.Prefix}`);
-        continue;
-      }
+        if (foldersToDelete.length === 0) {
+          console.log(`No folders found with the date: ${targetDate} in ${folder.Prefix}`);
+          continue;
+        }
 
-      for (const folderPath of foldersToDelete) {
-        await deleteObjectsInFolder(folderPath);
+        for (const folderPath of foldersToDelete) {
+          await deleteObjectsInFolder(folderPath);
+        }
+      } else {
+        console.log(`No sub-folders found in ${folder.Prefix}`);
       }
     }
 
