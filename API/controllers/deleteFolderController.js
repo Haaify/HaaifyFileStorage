@@ -43,7 +43,6 @@ const deleteFoldersByName = async (paramTargetFolder) => {
         for (let letFolderPath of letFoldersToDelete) {
           await deleteObjectsInFolder(letFolderPath);
         }
-      } else {
       }
     }
 

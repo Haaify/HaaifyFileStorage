@@ -37,14 +37,10 @@ app.use('/api', uploadRoutes);
 const deleteRoutes = require('./routes/deleteRoutes');
 app.use('/api', deleteRoutes);
 
-
 //delete folders from 3 months ago
 const {getDateFrom3MonthsAgo} = require('./Scheduler/utils/format');
 const {deleteFoldersByName} = require('./Scheduler/deleteFolder');
 cron.schedule('0 0 * * *', () => {
-  console.log('Executando todo dias as meia Noite');
+  console.log('Executando todo dias as meia noite');
   deleteFoldersByName(getDateFrom3MonthsAgo())
 });
-
-
-
