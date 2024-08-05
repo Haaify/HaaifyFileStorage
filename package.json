@@ -12,6 +12,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.623.0",
     "body-parser": "^1.20.2",
+    "cron": "^3.1.7",
     "express": "^4.19.2",
     "haaifyfilestorage": "file:",
     "multer": "^1.4.5-lts.1",

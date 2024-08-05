@@ -9,44 +9,7 @@ const constS3Client = new S3Client({
   },
 });
 
-const deleteObjectsInFolder = async (paramFolderPath) => {
-  try {
-    let letListParams = {
-      Bucket: 'haaifylink',
-      Prefix: paramFolderPath,
-    };
-
-    let letListedObjects = await constS3Client.send(new ListObjectsV2Command(letListParams));
-
-    if (!letListedObjects.Contents || letListedObjects.Contents.length === 0) {
-      console.log(`No objects found in folder: ${paramFolderPath}`);
-      return;
-    }
-
-    let letDeleteParams = {
-      Bucket: 'haaifylink',
-      Delete: { Objects: [] },
-    };
-
-    letListedObjects.Contents.forEach(({ Key }) => {
-      letDeleteParams.Delete.Objects.push({ Key });
-    });
-
-    console.log('Objects to delete:', letDeleteParams.Delete.Objects);
-
-    let letDeleteResponse = await constS3Client.send(new DeleteObjectsCommand(letDeleteParams));
-
-    console.log(`Deleted objects in folder: ${paramFolderPath}`, letDeleteResponse);
-
-    if (letListedObjects.IsTruncated) {
-      await deleteObjectsInFolder(paramFolderPath);
-    }
-  } catch (err) {
-    console.error('Error deleting objects:', err);
-  }
-};
-
-const deleteFoldersByDate = async (paramTargetFolder) => {
+const deleteFoldersByName = async (paramTargetFolder) => {
   try {
 
     let letListParams = {
@@ -89,4 +52,41 @@ const deleteFoldersByDate = async (paramTargetFolder) => {
   }
 };
 
-module.exports = { deleteFoldersByDate };
+const deleteObjectsInFolder = async (paramFolderPath) => {
+  try {
+    let letListParams = {
+      Bucket: 'haaifylink',
+      Prefix: paramFolderPath,
+    };
+
+    let letListedObjects = await constS3Client.send(new ListObjectsV2Command(letListParams));
+
+    if (!letListedObjects.Contents || letListedObjects.Contents.length === 0) {
+      console.log(`No objects found in folder: ${paramFolderPath}`);
+      return;
+    }
+
+    let letDeleteParams = {
+      Bucket: 'haaifylink',
+      Delete: { Objects: [] },
+    };
+
+    letListedObjects.Contents.forEach(({ Key }) => {
+      letDeleteParams.Delete.Objects.push({ Key });
+    });
+
+    console.log('Objects to delete:', letDeleteParams.Delete.Objects);
+
+    let letDeleteResponse = await constS3Client.send(new DeleteObjectsCommand(letDeleteParams));
+
+    console.log(`Deleted objects in folder: ${paramFolderPath}`, letDeleteResponse);
+
+    if (letListedObjects.IsTruncated) {
+      await deleteObjectsInFolder(paramFolderPath);
+    }
+  } catch (err) {
+    console.error('Error deleting objects:', err);
+  }
+};
+
+module.exports = { deleteFoldersByName };
