@@ -1,6 +1,4 @@
 const express = require('express');
-const multer = require('multer');
-const { S3Client, PutObjectCommand } = require('@aws-sdk/client-s3');
 const { createServer } = require('http');
 
 const app = express();
@@ -8,74 +6,34 @@ const PORT = process.env.PORT || 8080;
 const server = createServer(app);
 
 app.use(express.json());
-server.listen(PORT, () => { 
-    console.log(`Servidor rodando na porta ${PORT}`);
+
+// Middleware para tratar erros de parsing JSON
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    console.error('Bad JSON:', err.body);
+    return res.status(400).send({ error: 'Invalid JSON' });
+  }
+  next();
 });
 
-app.use((err, req, res, next) => {// Middleware to handle JSON parsing errors
-    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-        console.error('Bad JSON:', err.body);
-        return res.status(400).send({ error: 'Invalid JSON' });
-    }
-    next();
-});
-
+// Rota de teste
 app.get('/', async (req, res) => {
-    try {
-        res.status(200).json({ message: "ok" });
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(400).json({ error: 'Invalid' });
-    }
+  try {
+    res.status(200).json({ message: 'ok' });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(400).json({ error: 'Invalid' });
+  }
 });
 
-
-const s3 = new S3Client({
-    endpoint: `https://nyc3.digitaloceanspaces.com`,
-    region: 'us-east-1',
-    credentials: {
-      accessKeyId: process.env.access_key_id,
-      secretAccessKey: process.env.secret_access_key
-    }
- });
-
-const upload = multer({
-    storage: multer.memoryStorage(),
-    limits: { fileSize: 10 * 1024 * 1024 }, 
+// Iniciar servidor
+server.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
 });
 
-
-const {formatarData, formatarHorario} = require('.//utils.js');
-app.post('/upload', upload.single('file'), async (req, res) => {
-    try {
-        const file = req.file;
-        if (!file) {
-            return res.status(400).send('Nenhum arquivo enviado.');
-        }
-
-        let paramFolder = req.query.folder || "Default"
-
-        const fileName = `${paramFolder}/${formatarData()}/${formatarHorario()}-${file.originalname}`.replace(/ /g, "_");
-
-        const uploadParams = {
-            Bucket: 'haaifylink', 
-            Key: fileName,
-            Body: file.buffer,
-            ACL: 'private',
-            Metadata: {
-                "x-amz-meta-my-key": "your-value"
-            }
-        };
-
-        const command = new PutObjectCommand(uploadParams);
-        await s3.send(command);
-
-        res.status(200).send(`Arquivo enviado com sucesso: ${fileName}`);
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao enviar o arquivo.');
-    }
-});
+// Importar e usar rotas
+const uploadRoutes = require('./routes/uploadRoutes');
+app.use('/api', uploadRoutes);
 
 
 
