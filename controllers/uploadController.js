@@ -42,7 +42,7 @@ const uploadBuffer = async (buffer, originalName, folder, res) => {
       Bucket: 'haaifylink',
       Key: fileName,
       Body: buffer,
-      ACL: 'private',
+      ACL: 'public',
       Metadata: {
         'x-amz-meta-my-key': 'your-value',
       },
@@ -78,7 +78,7 @@ const uploadFromUrl = async (url, folder, res) => {
       Bucket: 'haaifylink',
       Key: fileName,
       Body: fileBuffer,
-      ACL: 'private',
+      ACL: 'public',
       ContentType: contentType,
       Metadata: {
         'x-amz-meta-my-key': 'your-value',
