@@ -66,12 +66,12 @@ const uploadFromUrl = async (paramUrl, paramFolder, res) => {
     };
 
     let letCommand = new PutObjectCommand(uploadParams);
-    await constS3Client.send(letCommand);
-
-    res.status(200).send(`Arquivo enviado com sucesso: ${letFileName}`);
+    let letSave = await constS3Client.send(letCommand);
+ 
+    res.status(200).send({message: `Arquivo enviado com sucesso`, save: letSave});
   } catch (err) {
     console.error('Erro ao baixar o arquivo:', err);
-    res.status(500).send('Erro ao baixar o arquivo.');
+    res.status(403).send('Erro ao baixar o arquivo.');
   }
 };
 
