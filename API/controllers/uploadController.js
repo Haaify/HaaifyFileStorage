@@ -15,14 +15,17 @@ const constS3Client = new S3Client({
 
 const uploadFile = async (req, res) => {
   try {
-    let letFile = req.file;
-    let { letUrl, letFolder } = req.body;
+    let file = req.file;
+    let { url, folder } = req.body;
 
-    if (letFile) {
-      await uploadBuffer(letFile.buffer, letFile.originalname, letFolder, res);
 
-    } else if (letUrl) {
-      await uploadFromUrl(letUrl, letFolder, res);
+
+
+    if (file) {
+      await uploadBuffer(file.buffer, file.originalname, folder, res);
+
+    } else if (url) {
+      await uploadFromUrl(url, folder, res);
 
     } else {
       return res.status(400).send('Nenhum arquivo ou URL fornecido.');
