@@ -21,7 +21,7 @@ const uploadBuffer = async (paramBuffer, paramOriginalName, paramFolder, res) =>
       Bucket: 'haaifylink',
       Key: letFileName,
       Body: paramBuffer,
-      ACL: 'public',
+      ACL: 'public-read',
       Metadata: {
         'x-amz-meta-my-key': 'your-value',
       },
@@ -54,18 +54,18 @@ const uploadFromUrl = async (paramUrl, paramFolder, res) => {
 
     let letFileBuffer = await letResponse.arrayBuffer();
 
-    const uploadParams = {
+    let letUploadParams = {
       Bucket: 'haaifylink',
       Key: letFileName,
       Body: letFileBuffer,
-      ACL: 'public',
+      ACL: 'public-read',
       ContentType: letContentType,
       Metadata: {
         'x-amz-meta-my-key': 'your-value',
       },
     };
 
-    let letCommand = new PutObjectCommand(uploadParams);
+    let letCommand = new PutObjectCommand(letUploadParams);
     let letSave = await constS3Client.send(letCommand);
  
     res.status(200).send({message: `Arquivo enviado com sucesso`, save: letSave});
