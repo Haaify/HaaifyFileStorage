@@ -1,7 +1,5 @@
-const { formatarData, formatarHorario } = require('../utils/format');
 const { S3Client, ListObjectsV2Command, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
 
-// Configurar o cliente S3
 const s3Client = new S3Client({
   endpoint: 'https://nyc3.digitaloceanspaces.com',
   region: 'us-east-1',
@@ -11,19 +9,14 @@ const s3Client = new S3Client({
   },
 });
 
-// Função para deletar todos os objetos dentro de um folder
 const deleteObjectsInFolder = async (folderPath) => {
   try {
-    console.log(`Attempting to delete objects in folder: ${folderPath}`);
-
     const listParams = {
       Bucket: 'haaifylink',
       Prefix: folderPath,
     };
 
     const listedObjects = await s3Client.send(new ListObjectsV2Command(listParams));
-
-    console.log('ListObjectsV2Command response:', listedObjects);
 
     if (!listedObjects.Contents || listedObjects.Contents.length === 0) {
       console.log(`No objects found in folder: ${folderPath}`);
@@ -45,9 +38,7 @@ const deleteObjectsInFolder = async (folderPath) => {
 
     console.log(`Deleted objects in folder: ${folderPath}`, deleteResponse);
 
-    // Recursively delete if there are more objects
     if (listedObjects.IsTruncated) {
-      console.log(`More objects to delete in folder: ${folderPath}`);
       await deleteObjectsInFolder(folderPath);
     }
   } catch (err) {
@@ -55,10 +46,8 @@ const deleteObjectsInFolder = async (folderPath) => {
   }
 };
 
-// Função principal para buscar e deletar folders por data
 const deleteFoldersByDate = async (targetDate) => {
   try {
-    console.log(`Starting folder deletion process for date: ${targetDate}`);
 
     const listParams = {
       Bucket: 'haaifylink',
@@ -67,9 +56,6 @@ const deleteFoldersByDate = async (targetDate) => {
 
     const rootFolders = await s3Client.send(new ListObjectsV2Command(listParams));
 
-    console.log('ListObjectsV2Command for root folders response:', rootFolders);
-
-    // Listar folders dentro de cada folder principal
     for (const folder of rootFolders.CommonPrefixes) {
       const subFolderParams = {
         Bucket: 'haaifylink',
@@ -79,11 +65,8 @@ const deleteFoldersByDate = async (targetDate) => {
 
       const subFolders = await s3Client.send(new ListObjectsV2Command(subFolderParams));
 
-      console.log(`Sub-folders within ${folder.Prefix}:`, subFolders);
 
-      // Verificação se CommonPrefixes existe antes de tentar mapear
       if (subFolders.CommonPrefixes) {
-        // Filtrar subfolders com a data desejada
         const foldersToDelete = subFolders.CommonPrefixes
           .map(prefix => prefix.Prefix)
           .filter(prefix => prefix.includes(targetDate));
@@ -91,7 +74,6 @@ const deleteFoldersByDate = async (targetDate) => {
         console.log(`Folders found for deletion: ${foldersToDelete.join(', ')}`);
 
         if (foldersToDelete.length === 0) {
-          console.log(`No folders found with the date: ${targetDate} in ${folder.Prefix}`);
           continue;
         }
 
@@ -99,11 +81,9 @@ const deleteFoldersByDate = async (targetDate) => {
           await deleteObjectsInFolder(folderPath);
         }
       } else {
-        console.log(`No sub-folders found in ${folder.Prefix}`);
       }
     }
 
-    console.log('Folder deletion process complete.');
   } catch (err) {
     console.error('Error listing or deleting folders:', err);
   }

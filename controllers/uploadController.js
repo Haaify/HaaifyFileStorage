@@ -15,15 +15,15 @@ const s3 = new S3Client({
 
 const uploadFile = async (req, res) => {
   try {
-    const file = req.file;
-    const { url, folder } = req.body;
+    let letFile = req.file;
+    let { letUrl, letFolder } = req.body;
 
-    if (file) {
-      // Caso seja um arquivo enviado diretamente
-      await uploadBuffer(file.buffer, file.originalname, folder, res);
-    } else if (url) {
-      // Caso seja um URL fornecido no corpo
-      await uploadFromUrl(url, folder, res);
+    if (letFile) {
+      await uploadBuffer(letFile.buffer, letFile.originalname, letFolder, res);
+
+    } else if (letUrl) {
+      await uploadFromUrl(letUrl, letFolder, res);
+
     } else {
       return res.status(400).send('Nenhum arquivo ou URL fornecido.');
     }
@@ -34,24 +34,25 @@ const uploadFile = async (req, res) => {
   }
 };
 
-const uploadBuffer = async (buffer, originalName, folder, res) => {
+const uploadBuffer = async (paramBuffer, paramOriginalName, paramFolder, res) => {
   try {
-    const fileName = `${folder || 'Default'}/${formatarData()}/${formatarHorario()}-${originalName}`.replace(/ /g, "_");
+    let letFileName = `${paramFolder || 'Default'}/${formatarData()}/${formatarHorario()}-${paramOriginalName}`.replace(/ /g, "_");
 
-    const uploadParams = {
+    let letUploadParams = {
       Bucket: 'haaifylink',
-      Key: fileName,
-      Body: buffer,
+      Key: letFileName,
+      Body: paramBuffer,
       ACL: 'public',
       Metadata: {
         'x-amz-meta-my-key': 'your-value',
       },
     };
 
-    const command = new PutObjectCommand(uploadParams);
-    await s3.send(command);
+    let letCommand = new PutObjectCommand(letUploadParams);
 
-    res.status(200).send(`Arquivo enviado com sucesso: ${fileName}`);
+    await s3.send(letCommand);
+
+    res.status(200).send(`Arquivo enviado com sucesso: ${letFileName}`);
   } catch (err) {
     console.error('Erro ao enviar o arquivo:', err);
     res.status(500).send('Erro ao enviar o arquivo.');
@@ -59,36 +60,36 @@ const uploadBuffer = async (buffer, originalName, folder, res) => {
 };
 
 // Função para fazer upload a partir de um URL
-const uploadFromUrl = async (url, folder, res) => {
+const uploadFromUrl = async (paramUrl, paramFolder, res) => {
   try {
-    const response = await fetch(url);
+    let letResponse = await fetch(paramUrl);
 
-    if (!response.ok) {
+    if (!letResponse.ok) {
       res.status(400).send('Falha ao baixar o arquivo. Verifique o URL e tente novamente.');
       return;
     }
 
-    const contentType = response.headers.get('content-type');
+    let letContentType = letResponse.headers.get('content-type');
 
-    const fileName = `${folder || 'Default'}/${formatarData()}/${formatarHorario()}-${uuidv4()}-${path.basename(url)}`.replace(/ /g, '_');
+    let letFileName = `${paramFolder || 'Default'}/${formatarData()}/${formatarHorario()}-${uuidv4()}-${path.basename(paramUrl)}`.replace(/ /g, '_');
 
-    const fileBuffer = await response.arrayBuffer();
+    let letFileBuffer = await letResponse.arrayBuffer();
 
     const uploadParams = {
       Bucket: 'haaifylink',
-      Key: fileName,
-      Body: fileBuffer,
+      Key: letFileName,
+      Body: letFileBuffer,
       ACL: 'public',
-      ContentType: contentType,
+      ContentType: letContentType,
       Metadata: {
         'x-amz-meta-my-key': 'your-value',
       },
     };
 
-    const command = new PutObjectCommand(uploadParams);
-    await s3.send(command);
+    let letCommand = new PutObjectCommand(uploadParams);
+    await s3.send(letCommand);
 
-    res.status(200).send(`Arquivo enviado com sucesso: ${fileName}`);
+    res.status(200).send(`Arquivo enviado com sucesso: ${letFileName}`);
   } catch (err) {
     console.error('Erro ao baixar o arquivo:', err);
     res.status(500).send('Erro ao baixar o arquivo.');
