@@ -39,7 +39,7 @@ app.use('/api', uploadRoutes);
 const {deleteFoldersByDate} = require('./controllers/deleteController');
 app.get('/teste', async (req, res) => {
   try {
-    tentativa = await deleteFoldersByDate('05-08-2024');
+    tentativa = await deleteFoldersByDate('03-08-2024');
 
     res.status(200).json({ message: tentativa });
   } catch (error) {
