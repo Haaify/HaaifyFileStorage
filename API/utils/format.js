@@ -12,8 +12,8 @@ function formatarHorario(data = new Date()) {
     const horas = String(data.getHours()).padStart(2, '0');
     const minutos = String(data.getMinutes()).padStart(2, '0');
     const segundos = String(data.getSeconds()).padStart(2, '0');
-  
+
     // Formatar no formato hh-mm-ss
     return `${horas}-${minutos}`;
-  }
-module.exports = {formatarData, formatarHorario};
+}
+module.exports = { formatarData, formatarHorario };

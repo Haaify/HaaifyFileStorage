@@ -1,4 +1,5 @@
 const { S3Client, ListObjectsV2Command, DeleteObjectsCommand } = require('@aws-sdk/client-s3');
+const { getDateFrom3MonthsAgo } = require('../../Scheduler/utils/format');
 
 const constS3Client = new S3Client({
     endpoint: 'https://nyc3.digitaloceanspaces.com',
@@ -9,7 +10,7 @@ const constS3Client = new S3Client({
     },
 });
 
-const deleteFoldersByName = async (paramTargetFolder) => {
+const deleteFoldersByName = async (paramTargetFolder = getDateFrom3MonthsAgo()) => {
     try {
 
         let letListParams = {
@@ -43,6 +44,7 @@ const deleteFoldersByName = async (paramTargetFolder) => {
                 for (let letFolderPath of letFoldersToDelete) {
                     await deleteObjectsInFolder(letFolderPath);
                 }
+            } else {
             }
         }
 
